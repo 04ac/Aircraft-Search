@@ -11,13 +11,24 @@ aircraft_code = st.text_input(label="Enter Aircraft Registration:").upper()
 
 from bs4 import BeautifulSoup
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 
 if st.button("Search"):
 
     HEADERS = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62'
+            # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36'
         }
-    html_text = requests.get("https://flightaware.com/resources/registration/" + aircraft_code, headers=HEADERS).text
+
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    html_text = session.get("https://flightaware.com/resources/registration/" + aircraft_code).text
 
     soup = BeautifulSoup(html_text, 'lxml')
 
@@ -47,9 +58,14 @@ if st.button("Search"):
     if flag == 0:
         st.subheader("Aircraft Information:")
 
-    ac2 = aircraft_code.upper()
-    req = requests.get("https://www.flightera.net/en/planes/"+ac2, headers=HEADERS)
-    html_text = req.content
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    req = session.get("https://www.flightera.net/en/planes/" + aircraft_code)
+    html_text = req.text
 
 
 
@@ -88,8 +104,14 @@ if st.button("Search"):
     import urllib.request
     from PIL import Image
 
-    js = requests.get("https://api.planespotters.net/pub/photos/reg/"+aircraft_code)
-    data = json.loads(js.text)
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    js = session.get("https://api.planespotters.net/pub/photos/reg/" + aircraft_code).text
+    data = json.loads(js)
     if not len(data['photos']) == 0:
         urllib.request.urlretrieve(data['photos'][0]['thumbnail_large']['src'],"a.png")
         img = Image.open("a.png")
