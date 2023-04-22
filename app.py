@@ -155,11 +155,14 @@ uploaded_file = st.file_uploader("Or Upload Image:", type=['jpg', 'png', 'jpeg']
 
 
 if st.button("Search"):
-    if aircraft_code is not "":
+    if aircraft_code != "":
         aircraft_search(aircraft_code)
 
     if uploaded_file is not None:
-        img = cv2.imread('Images/'+uploaded_file.name)
+        img = Image.open(uploaded_file)
+        # Converts PIL image to OpenCv
+        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        # Display scaled image if size is too large
         if img.shape[0] > 600 or img.shape[1] > 600:
             w, h, c = img.shape
             sf = 400/w
