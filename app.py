@@ -149,6 +149,7 @@ def aircraft_search(ac):
 
 
 import easyocr
+import re
 from PIL import Image
 uploaded_file = st.file_uploader("Or Upload Image:", type=['jpg', 'png', 'jpeg'])
 
@@ -165,12 +166,21 @@ if st.button("Search"):
             img2 = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), None, fx=sf, fy=sf, interpolation=cv2.INTER_AREA)
             st.image(img2)
         else:
-            st.image(img)
+            st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         reader = easyocr.Reader(['en'], gpu=True)
         text_list = list(reader.readtext(img, detail=0))
         # text_list
         for item in text_list:
-            if len(item) == 6 and item.isupper():
-                st.title(item)
-                aircraft_search(item)
+            item = item.upper()
+            # Substitute underscores for dashes
+            item = re.sub("_", "-", item)
+            itemWithOnlyNumbersLettersAndDashes = re.sub("[^\w-]", "", item)
+            # Prefixes with no dashes: "HL, N, UK, JA, UR(with or without), HI"
+            # + signifies one or more occurrences
+            pattern = r"\w+-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
+            matches = re.findall(pattern, itemWithOnlyNumbersLettersAndDashes)
+            if len(matches) != 0:
+                if len(matches[0]) == len(item):
+                    st.title(item)
+                    aircraft_search(item)
