@@ -173,15 +173,22 @@ if st.button("Search"):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         reader = easyocr.Reader(['en'], gpu=True)
         text_list = list(reader.readtext(img, detail=0))
-        # text_list
+
+        # Remove Duplicates
+        list_without_duplicates = []
         for item in text_list:
+            if item not in list_without_duplicates:
+                list_without_duplicates.append(item)
+
+        # list_without_duplicates
+        for item in list_without_duplicates:
             item = item.upper()
             # Substitute underscores for dashes
             item = re.sub("_", "-", item)
             itemWithOnlyNumbersLettersAndDashes = re.sub("[^\w-]", "", item)
             # Prefixes with no dashes: "HL, N, UK, JA, UR(with or without), HI"
             # + signifies one or more occurrences
-            pattern = r"\w+-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
+            pattern = r"\w{1,4}-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
             matches = re.findall(pattern, itemWithOnlyNumbersLettersAndDashes)
             if len(matches) != 0:
                 if len(matches[0]) == len(item):
