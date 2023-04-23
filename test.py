@@ -1,6 +1,11 @@
 from bs4 import BeautifulSoup
+import numpy as np
+import urllib
 import requests
+import easyocr
+import cv2
 
-html_text = requests.get("https://www.airfleets.net/recherche/?key=N747NA")
-soup = BeautifulSoup(html_text, "lxml")
-
+img = cv2.imread('Images/Registration_test.jpg')
+reader = easyocr.Reader(['en'], gpu=False)
+text = reader.readtext(img, detail=0)
+print(type(text[0].strip()))

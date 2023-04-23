@@ -1,4 +1,5 @@
 # Basic Aircraft Search application
+### !! New Feature: Aircraft identification from image uploaded by user.
 - Supports lookup of aircraft via their registration
 - Displays details about the aircraft such as Manufacturer, Engines, First Flight, etc...
 - Displays an image of the aircraft from the planespotters.net API
