@@ -37,6 +37,7 @@ pip install -r requirements.txt
 
 ```
 import aircraft_search
+#####
 ```
 
 #### Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
@@ -54,7 +55,7 @@ Available endpoints at http://127.0.0.1:8000:
 #### Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
 
 ```
-streamlit run streamlit.py
+streamlit run streamlit_web_interface.py
 ```
 
 Visit http://localhost:8501 in a browser to see the web interface
@@ -63,6 +64,7 @@ Visit http://localhost:8501 in a browser to see the web interface
 
 - [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the registration number from https://planefinder.net/flight/\<flight number\>
 - [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can upload image files
+- [ ] OCR: Switch to a faster OCR engine
 
 ## License
 
