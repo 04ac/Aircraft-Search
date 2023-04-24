@@ -4,7 +4,7 @@ Aircraft details provider that queries multiple sources to find and aggregate in
 
 There are three available versions:
 
-- Base Scraper module with OCR
+- Base Scraper module with OCR [Contains most number of features]
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
 - Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
 
@@ -33,14 +33,28 @@ pip install -r requirements.txt
 
 ## Usage
 
-#### Base Scraper module with OCR
+#### - Base scraper module
+
+`example_module.py`:
 
 ```
+import json
 import aircraft_search
-#####
+
+aircraft_reg_no = "N145DQ"  # aircraft registration number
+
+# Logging is disabled by default and hence the only output
+# is the data about the aircraft being returned as an JSON object
+# aircraft_data = aircraft_search.aircraft_details_query(
+#     aircraft_registration_number)
+
+aircraft_data = aircraft_search.aircraft_details_query(
+    aircraft_reg_no, logging=True)
+print("\nJSON data:\n", json.dumps(aircraft_data, indent=4))
+
 ```
 
-#### Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
+#### - Web API
 
 ```
 uvicorn api:app
@@ -48,11 +62,11 @@ uvicorn api:app
 
 Available endpoints at http://127.0.0.1:8000:
 
-- `/queryByReg?regno=<input aircraft registration number here>` Request type: GET/POST
+- `/query?regno=<input aircraft registration number here>` Request type: GET/POST
 
 - `/queryByImage?imageurl=<input aircraft's image url>` Request type: GET/POST
 
-#### Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+#### - Web interface
 
 ```
 streamlit run streamlit_web_interface.py
