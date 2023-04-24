@@ -33,20 +33,20 @@ def get_website(site_link, regno):
 
 def aircraft_details_query(reg_no):
     st.title(reg_no)
-    st.markdown("---\nAircraft image from planespotters.net:")
+    st.markdown("---\nAircraft's image from planespotters.net:")
     req = get_website(
         "https://api.planespotters.net/pub/photos/reg/", reg_no)
     if req[0] > 300:
-        st.text("Image not available")
+        st.text("Aircraft's image not available")
     else:
         data = json.loads(req[1])
         if not len(data["photos"]) == 0:
             urllib.request.urlretrieve(
-                data["photos"][0]["thumbnail_large"]["src"], "a.png")
-            img = Image.open("a.png")
+                data["photos"][0]["thumbnail_large"]["src"], "_most_recent_aircraft_image.png")
+            img = Image.open("_most_recent_aircraft_image.png")
             st.image(img)
         else:
-            st.text("Image not available")
+            st.text("Aircraft's image not available")
 
     st.markdown("---\nQuerying flightaware.com...")
     req = get_website(
@@ -103,8 +103,7 @@ def aircraft_details_query(reg_no):
         df0.rename(columns={0: "Item", 1: "Information"}, inplace=True)
         st_aggrid.AgGrid(df0, columns_auto_size_mode=2)
 
-        st.markdown("---")
-        st.subheader("Past Flights:")
+        st.markdown("---\nPast Flights:")
         if len(tables) < 3:
             st.text("No past flights found")
         else:
