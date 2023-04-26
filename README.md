@@ -1,12 +1,12 @@
 # Aircraft Search
 
-Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCRd](https://en.wikipedia.org/wiki/Optical_character_recognition) and then queried.
+Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
 
 There are three available versions:
 
-- Base Scraper module with OCR [Contains most number of features]
-- Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+- `aircraft_search.py`: Base Scraper module with OCR [Contains most number of features]
+- `api.py`: Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
+- `streamlit_web_interface.py`: Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
 
 ## Features
 
@@ -81,10 +81,5 @@ Visit http://localhost:8501 in a browser to see the web interface
 - [ ] Web interface: Make a web app using the API as backend with features:
   - [ ] Query multiple reg numbers / flight numbers in parallel
   - [ ] Show aviation related fun facts while the backend API fetches the results
-  - OCR [ ] Add option to upload and query from aircraft image or plane ticket
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> reg number -> Query
-
-## License
-
-This project is licensed under the terms of the MIT license.
