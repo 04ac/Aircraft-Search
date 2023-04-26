@@ -4,9 +4,10 @@ Aircraft details provider that queries multiple sources to find and aggregate in
 
 There are three available versions:
 
-- `aircraft_search.py`: Base Scraper module with OCR [Contains most number of features]
-- `api.py`: Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- `streamlit_web_interface.py`: Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+- Base Scraper module with OCR [Contains most number of features]
+- Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
+- Web interface #1
+- Web interface #2 made with [Streamlit](https://github.com/streamlit/streamlit)
 
 ## Features
 
@@ -54,25 +55,23 @@ print("\nJSON data:\n", json.dumps(aircraft_data, indent=4))
 
 ```
 
-#### - Web API
+#### - API + Web interface #1
 
 ```
 uvicorn api:app
 ```
 
-Available endpoints at http://127.0.0.1:8000:
+Visit http://127.0.0.1:8000 in a browser to view the web interface
+
+Available endpoint(s):
 
 - `/query?regno=<input aircraft reg number here>` Request type: GET/POST
 
-- `/queryByImage?imageurl=<input aircraft's image url>` Request type: GET/POST
-
-#### - Web interface (Streamlit)
+#### - Web interface #2 (Streamlit)
 
 ```
 streamlit run streamlit_web_interface.py
 ```
-
-Visit http://localhost:8501 in a browser to see the web interface
 
 ## Todo
 
