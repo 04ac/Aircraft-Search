@@ -48,7 +48,7 @@ def aircraft_details_query(reg_no, logging=False, show_image=False):
         aircraft_data["success"] = False
         aircraft_data["message"] = "Aircraft registration number must not be blank"
         return aircraft_data
-    reg_no = reg_no.upper().strip()
+    reg_no = reg_no.upper().strip().replace(" ", "")
 
     _print("Details for {}:".format(reg_no))
     req = get_website(
@@ -177,8 +177,8 @@ Querying flightera.net...")
                             break
                     past_flights["TO"][i] = "".join(l)
                     i += 1
-                print("Past Flights:")
-                print(past_flights)
+                _print("Past Flights:")
+                _print(past_flights)
                 past_flights_json = json.loads(
                     past_flights.to_json(orient="records"))
                 # most_freq_airports_df.to_json)
