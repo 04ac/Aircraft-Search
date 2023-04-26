@@ -1,0 +1,167 @@
+@media screen and (max-width: 500px) {
+  .header,
+  .content,
+  .mode-selector {
+    flex-direction: column;
+  }
+
+  .content-left {
+    border-right: none !important;
+    max-width: 100% !important;
+    border-bottom: 2px black solid;
+  }
+
+  .mode-selector {
+    max-width: none !important;
+    border-right: none !important;
+    border-bottom: 2px black solid;
+  }
+
+  .loader-container {
+    transform: none !important;
+  }
+}
+
+body {
+  font-family: Verdana, Helvetica, Arial;
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+.header,
+.content,
+.content-left,
+.mode-selector {
+  display: flex;
+}
+
+.content-left {
+  flex-direction: column;
+}
+
+.header-logo {
+  text-align: center;
+}
+
+.content {
+  border-bottom: 2px black solid;
+}
+
+.header {
+  padding: 24px;
+  border-bottom: 2px black solid;
+  justify-content: space-between;
+}
+
+.header-logo {
+  font-size: 20px;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+}
+
+.header-login-status {
+  margin-top: 10px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.content {
+  font-size: 14px;
+  /* height: 70vh; */
+}
+
+.content-left {
+  border-right: 2px black solid;
+  max-width: 40%;
+}
+
+.mode-selector {
+  border-bottom: 2px black solid;
+}
+
+.mode-selector-cell {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+}
+
+.mode-selector-cell-selected {
+  background-color: aqua;
+}
+
+.query-container {
+  justify-content: space-between;
+  padding: 10px;
+  max-width: 500px;
+}
+
+input {
+  /* display: block; */
+  margin-top: 16px;
+}
+
+button {
+  display: inline;
+}
+
+.loader-container {
+  display: none;
+  height: 100%;
+  text-align: center;
+  transform: translate(50%, 50%);
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-radius: 80%;
+  border-top: 6px solid #3498db;
+  width: 20px;
+  height: 20px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  text-align: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.aircraft-image-container {
+  display: none;
+  margin: 10px 0;
+}
+
+.image {
+  max-width: 300px;
+}
+
+.results-container {
+  padding: 10px;
+  font-size: 8px;
+}
+
+pre {
+  outline: 1px solid #ccc;
+  padding: 5px;
+  margin: 5px;
+}
+.string {
+  color: green;
+}
+.number {
+  color: darkorange;
+}
+.boolean {
+  color: blue;
+}
+.null {
+  color: magenta;
+}
+.key {
+  color: red;
+}

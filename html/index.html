@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Aircraft Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}" />
+    <script src="{{ url_for('static', path='/scripts.js') }}"></script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-logo">Aircraft Search</div>
+      <div class="header-right"></div>
+    </div>
+    <div class="content">
+      <div class="content-left">
+        <div class="mode-selector">
+          <div
+            class="mode-selector-cell mode-selector-cell-selected"
+            data-mode="regNo"
+          >
+            Search with Registration number
+          </div>
+          <div class="mode-selector-cell" data-mode="flightNo">
+            Search with Flight Number
+          </div>
+        </div>
+        <div class="query-container">
+          <div class="query-instruction">
+            Enter aircraft's registration number:
+          </div>
+          <form id="queryForm">
+            <input
+              id="number-input"
+              type="text"
+              placeholder="N145DQ for example"
+              maxlength="10"
+              value="N145DQ"
+              ;
+            />
+            <button type="submit" value="send">Query</button>
+          </form>
+          <div class="loader-container"><div class="loader"></div></div>
+          <div class="aircraft-image-container">
+            <img
+              class="image"
+              src=""
+              id="aircraft-image"
+              alt="Aircraft's image will load here if available"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="results-container">
+        <div class="results"></div>
+      </div>
+    </div>
+  </body>
+  <script defer>
+    init();
+  </script>
+</html>
