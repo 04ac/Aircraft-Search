@@ -1,6 +1,6 @@
 # Aircraft Search
 
-Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number or image, which will be [OCRd](https://en.wikipedia.org/wiki/Optical_character_recognition) and then queried.
+Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCRd](https://en.wikipedia.org/wiki/Optical_character_recognition) and then queried.
 
 There are three available versions:
 
@@ -62,11 +62,11 @@ uvicorn api:app
 
 Available endpoints at http://127.0.0.1:8000:
 
-- `/query?regno=<input aircraft registration number here>` Request type: GET/POST
+- `/query?regno=<input aircraft reg number here>` Request type: GET/POST
 
 - `/queryByImage?imageurl=<input aircraft's image url>` Request type: GET/POST
 
-#### - Web interface
+#### - Web interface (Streamlit)
 
 ```
 streamlit run streamlit_web_interface.py
@@ -76,9 +76,13 @@ Visit http://localhost:8501 in a browser to see the web interface
 
 ## Todo
 
-- [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the registration number from https://planefinder.net/flight/\<flight number\>
+- [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the reg number from https://planefinder.net/flight/\<flight number\>
 - [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can upload image files
+- [ ] Web interface: Make a web app using the API as backend with features:
+  - [ ] Query multiple reg numbers / flight numbers in parallel
+  - [ ] Show aviation related fun facts while the backend API fetches the results
 - [ ] OCR: Switch to a faster OCR engine
+- [ ] OCR: Flight ticket Flight Number -> reg number -> Query
 
 ## License
 
