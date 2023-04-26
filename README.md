@@ -1,6 +1,6 @@
 # Aircraft Search
 
-Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCRd](https://en.wikipedia.org/wiki/Optical_character_recognition) and then queried.
+Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
 
 There are three available versions:
 
@@ -83,7 +83,3 @@ Visit http://localhost:8501 in a browser to see the web interface
   - [ ] Show aviation related fun facts while the backend API fetches the results
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> reg number -> Query
-
-## License
-
-This project is licensed under the terms of the MIT license.
