@@ -1,13 +1,15 @@
 # Aircraft Search
 
-Aircraft details provider that queries multiple sources to find and aggregate information about a given plane. Data can be obtained by providing a plane's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
+https://github.com/04ac/Aircraft-Search
 
-There are three available versions:
+Aircraft details provider that queries multiple sources to find and display information about a given aircraft. Data can be obtained by providing the aircraft's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
 
-- Base Scraper module with OCR [Contains most number of features]
+There are four available versions:
+
+- Base Scraper module with OCR (module without frontend)
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- Web interface #1
-- Web interface #2 made with [Streamlit](https://github.com/streamlit/streamlit)
+- Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+- HTML Web Interface (Currently In progress)
 
 ## Features
 
@@ -55,7 +57,7 @@ print("\nJSON data:\n", json.dumps(aircraft_data, indent=4))
 
 ```
 
-#### - API + Web interface #1
+#### - API + HTML Web interface
 
 ```
 uvicorn api:app
@@ -67,7 +69,7 @@ Available endpoint(s):
 
 - `/query?regno=<input aircraft reg number here>` Request type: GET/POST
 
-#### - Web interface #2 (Streamlit)
+#### - Streamlit Web Interface
 
 ```
 streamlit run streamlit_web_interface.py
@@ -75,10 +77,9 @@ streamlit run streamlit_web_interface.py
 
 ## Todo
 
-- [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the reg number from https://planefinder.net/flight/\<flight number\>
+- [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the reg number from https://planefinder.net/flight/<flight number\>
 - [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can upload image files
 - [ ] Web interface: Make a web app using the API as backend with features:
-  - [ ] Query multiple reg numbers / flight numbers in parallel
-  - [ ] Show aviation related fun facts while the backend API fetches the results
+- [ ] Query multiple reg numbers / flight numbers in parallel
 - [ ] OCR: Switch to a faster OCR engine
-- [ ] OCR: Flight ticket Flight Number -> reg number -> Query
+- [ ] OCR: Flight ticket Flight Number -> Query
