@@ -72,32 +72,33 @@ def aircraft_details_query(reg_no, logging=False, show_image=False):
 
     _print("\n===========================================================\n\
 Querying flightaware.com...")
+    # Source1: flightaware.com
     req = get_website(
         "https://flightaware.com/resources/registration/", reg_no)
 
     if req[0] > 300:
         _print("Data not available")
     else:
-        details_from_flightaware = {}
+        data_from_source1 = {}
         soup = BeautifulSoup(req[1], "lxml")
         info = soup.find("div", class_="pageContainer")
         data = info.findAll("div", class_="attribute-row")
         for i in data:
-            details_from_flightaware[i.find("div", class_="medium-1 columns title-text").text] = remove_delimiters(
+            data_from_source1[i.find("div", class_="medium-1 columns title-text").text] = remove_delimiters(
                 i.find("div", class_="medium-3 columns").text.replace("\n", " "))
-        if len(details_from_flightaware.items()) > 1:
-            engine = details_from_flightaware["Engine"]
-            details_from_flightaware["Engine"] = engine[:engine.find(
+        if len(data_from_source1.items()) > 1:
+            engine = data_from_source1["Engine"]
+            data_from_source1["Engine"] = engine[:engine.find(
                 "Thrust")] + " " + engine[engine.find("Thrust") + 8:] + " thrust"
-            details_from_flightaware_df = pd.DataFrame(details_from_flightaware.items()).rename(
+            source1_df = pd.DataFrame(data_from_source1.items()).rename(
                 columns={0: "Parameter", 1: "Value"}).set_index("Parameter")
-            details_from_flightaware_json = json.loads(
-                details_from_flightaware_df.to_json())
-            _print(details_from_flightaware_df)
-            # _print(json.dumps(details_from_flightaware_json, indent=4))
+            source1_json = json.loads(
+                source1_df.to_json())
+            _print(source1_df)
+            # _print(json.dumps(source1_json, indent=4))
             aircraft_data_index += 1
             aircraft_data["data"].append(
-                details_from_flightaware_json["Value"])
+                source1_json["Value"])
             aircraft_data["data"][aircraft_data_index]["source"] = "https://flightaware.com/resources/registration/"
         else:
             _print("Data not available")
@@ -120,6 +121,7 @@ Querying flightaware.com...")
 
     _print("\n===========================================================\n\
 Querying flightera.net...")
+    # Source 2: flightera.net
     req = get_website("https://www.flightera.net/en/planes/", reg_no)
     if req[0] > 300:
         _print("Data not available")
@@ -131,21 +133,21 @@ Querying flightera.net...")
         i = info.find(
             "dl", class_="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3")
         j = i.findAll("table")  # there are two tables, we need to merge them
-        details_flightera_df = pd.read_html(str(j[0]), index_col=0)[
+        source2_df = pd.read_html(str(j[0]), index_col=0)[
             0].rename(columns={0: "Parameter", 1: "Value"})
         try:
             details_flightera_df_2 = pd.read_html(str(j[1]), index_col=0)[
                 0].rename(columns={0: "Parameter", 1: "Value"})
-            details_flightera_df = pd.concat(
-                [details_flightera_df, details_flightera_df_2])
+            source2_df = pd.concat(
+                [source2_df, details_flightera_df_2])
         except:
             pass
-        _print(details_flightera_df)
-        details_flightera_json = json.loads(
-            details_flightera_df.to_json())
-        # _print(json.dumps(details_flightera_json, indent=4))
+        _print(source2_df)
+        source2_json = json.loads(
+            source2_df.to_json())
+        # _print(json.dumps(source2_json, indent=4))
         aircraft_data_index += 1
-        aircraft_data["data"].append(details_flightera_json["Value"])
+        aircraft_data["data"].append(source2_json["Value"])
         aircraft_data["data"][aircraft_data_index]["source"] = "https://www.flightera.net/en/planes/"
 
         tables = pd.read_html(html)
