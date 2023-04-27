@@ -6,10 +6,10 @@ There are four available versions:
 
 - Base Scraper module with OCR (module without frontend)
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- Web interface #1
+- HTML Web interface (Currently in progess)
 - Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
 
-  DEMO: https://aircraft-search.streamlit.app
+  Streamlit Web Interface: https://aircraft-search.streamlit.app
 
 ## Features
 

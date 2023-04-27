@@ -11,7 +11,8 @@ lxml>=4.9.1
 
 # Web interface
 streamlit>=1.21.0
-streamlit_aggrid>=0.3.4
+streamlit-aggrid>=0.3.4
+click
 
 # Web API
 fastapi>=0.95.1
