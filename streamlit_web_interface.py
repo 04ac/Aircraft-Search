@@ -13,7 +13,6 @@ import st_aggrid
 from PIL import Image
 import easyocr
 import random
-import time
 
 
 def remove_delimiters(word):
@@ -160,9 +159,8 @@ def display_fun_facts():
                  "The average Boeing 747 has a whopping 240-280 kilometres of electrical wiring",
                  "In the USA, over two million passengers board over 30,000 flights each day."]
 
-    time.sleep(1.5)
-    st.markdown("####")
-    st.markdown("#### While you wait -- Aviation Fun Fact:\n")
+    st.text("")
+    st.markdown("##### Aviation Fun Fact:\n")
     st.text(random.choice(fun_facts))
 
 
@@ -211,14 +209,17 @@ if st.button("Search"):
             # Substitute underscores for hyphens
             code = code.replace("_", "-")
             # Remove all characters that are not hyphens or alphanumeric
-            code_with_only_alphanumeric_characters_and_hyphens = re.sub("[^\w-]", "", code)
+            code_with_only_alphanumeric_characters_and_hyphens = re.sub(
+                "[^\w-]", "", code)
             # Possible prefixes without hyphens: "HL, N, UK, JA, UR(with or without), HI"
             pattern = r"\w{1,4}-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
-            matches = re.findall(pattern, code_with_only_alphanumeric_characters_and_hyphens)
+            matches = re.findall(
+                pattern, code_with_only_alphanumeric_characters_and_hyphens)
             if len(matches) > 0:
                 if len(matches[0]) == len(code):
                     aircraft_details_query(code)
                     st.markdown("---")
 
     if aircraft_code == "" and uploaded_file is None:
-        st.markdown("#### Please enter a valid aircraft registration number or upload an image.")
+        st.markdown(
+            "#### Please enter a valid aircraft registration number or upload an image.")
