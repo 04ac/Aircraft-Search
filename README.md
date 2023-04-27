@@ -1,18 +1,14 @@
 # Aircraft Search
 
-https://github.com/04ac/Aircraft-Search
-
-Streamlit Website is live!
-https://aircraft-search.streamlit.app
-
 Aircraft details provider that queries multiple sources to find and display information about a given aircraft. Data can be obtained by providing the aircraft's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
 
 There are four available versions:
 
 - Base Scraper module with OCR (module without frontend)
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
+- Web interface #1
 - Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
-- HTML Web Interface (Currently In progress)
+  DEMO: https://aircraft-search.streamlit.app
 
 ## Features
 
@@ -86,3 +82,7 @@ streamlit run streamlit_web_interface.py
 - [ ] Query multiple reg numbers / flight numbers in parallel
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> Query
+
+## License
+
+> Parent repository: [04ac/Aircraft-Search](https://github.com/04ac/Aircraft-Search)
