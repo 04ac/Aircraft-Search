@@ -76,12 +76,14 @@ streamlit run streamlit_web_interface.py
 
 ## Todo
 
-- [ ] Base module: Enable searching for an aircraft using Flight Number by scraping the reg number from https://planefinder.net/flight/<flight number\>
-- [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can upload image files
+- [ ] Enable searching for an aircraft using Flight Number by scraping the reg number from https://planefinder.net/flight/<flight number\>
+- [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can search using aircraft / flight ticket's image
 - [ ] Web interface: Make a web app using the API as backend with features:
 - [ ] Query multiple reg numbers / flight numbers in parallel
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> Query
+- [ ] Package aircraft_search as pip package
+- [ ] Add logo image with badges to README.md
 
 ## License
 
