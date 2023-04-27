@@ -8,8 +8,8 @@ There are four available versions:
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
 - HTML Web interface (Currently in progess)
 - Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
-
-  Streamlit Web Interface: https://aircraft-search.streamlit.app
+  
+  Streamlit URL: https://aircraft-search.streamlit.app
 
 ## Features
 
