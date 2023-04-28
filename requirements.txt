@@ -1,0 +1,19 @@
+# Base module
+Requests>=2.28.2
+urllib3>=1.26.5
+beautifulsoup4<=4.11.1
+numpy>=1.21.5
+pandas>=1.5.3
+Pillow>=9.0.1
+opencv-python<=4.5.5.62
+easyocr>=1.6.2
+lxml>=4.9.1
+
+# Web interface
+streamlit>=1.21.0
+streamlit-aggrid>=0.3.4
+click
+
+# Web API
+fastapi>=0.95.1
+uvicorn>=0.21.1
