@@ -88,4 +88,6 @@ streamlit run streamlit_web_interface.py
 
 ## License
 
+This project is licensed under the terms of the MIT License.
+
 > Parent repository: [04ac/Aircraft-Search](https://github.com/04ac/Aircraft-Search)
