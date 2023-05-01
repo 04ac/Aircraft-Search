@@ -233,7 +233,7 @@ with tab2:
     st.header("Flight Number Lookup")
 
     flight_number = st.text_input(
-        label="Enter flight number:", placeholder="Example:  LH500").upper().strip()
+        label="Enter flight number:", placeholder="Example:  DL301").upper().strip()
     
     if st.button("Search", key=1):
         status_code, html_text = get_website('https://www.flightera.net/en/flight/', flight_number)
@@ -287,25 +287,39 @@ with tab2:
             arrival = arrival_info.find("span", class_="whitespace-nowrap").text
 
 
-            _headings = info.findAll('dt', class_='text-left text-sm leading-5 font-bold text-gray-500 dark:text-gray-300')
+            _headings = info.findAll(
+                'dt', class_='text-left text-sm leading-5 font-bold text-gray-500 dark:text-gray-300')
             plane_info_headings = []
             for i in _headings:
                 plane_info_headings.append(i.text.strip())
 
-            _headings = info.findAll('dt', class_='text-right text-sm leading-5 font-bold text-gray-500 dark:text-gray-300')
+            _headings = info.findAll(
+                'dt', class_='text-right text-sm leading-5 font-bold text-gray-500 dark:text-gray-300')
             for k in _headings:
                 plane_info_headings.append(k.text.strip())
 
-            model_and_seat_config_info = info.findAll('dd', class_='text-left text-sm leading-5 text-gray-500 dark:text-white')
+            model_and_seat_config_info = info.findAll(
+                'dd', class_='text-left text-sm leading-5 text-gray-500 dark:text-white')
             plane_info_items = []
             for i in model_and_seat_config_info:
-                plane_info_items.append(i.text.strip())
+                if i != None:
+                    plane_info_items.append(i.text.strip())
+                else:
+                    plane_info_items.append("NA")
 
-            icao_identifier = info.find('dd', class_='text-right text-sm leading-5 text-gray-900 dark:text-white')
-            plane_info_items.append(icao_identifier.text.strip())
+            icao_identifier = info.find(
+                'dd', class_='text-right text-sm leading-5 text-gray-900 dark:text-white')
+            if icao_identifier != None:
+                plane_info_items.append(icao_identifier.text.strip())
+            else:
+                plane_info_items.append("NA")
 
-            first_flight = info.findAll('dd', class_='text-right text-sm leading-5 text-gray-500 dark:text-white')[1]
-            plane_info_items.append(first_flight.text.strip())
+            first_flight = info.findAll(
+                'dd', class_='text-right text-sm leading-5 text-gray-500 dark:text-white')
+            if len(first_flight) >= 2:
+                plane_info_items.append(first_flight[1].text.strip())
+            else:
+                plane_info_items.append("NA")
 
 
             plane_info_items[0] = " ".join(plane_info_items[0].split()) 
