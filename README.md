@@ -1,15 +1,10 @@
 # Aircraft Search
 
-Aircraft details provider that queries multiple sources to find and display information about a given aircraft. Data can be obtained by providing the aircraft's registration number (reg number) or image, which will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried.
+Aircraft details provider that queries multiple sources to find and display information about a given aircraft using any one of the following inputs:
 
-There are four available versions:
-
-- Base Scraper module with OCR (module without frontend)
-- Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- HTML Web interface (Currently in progess)
-- Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
-  
-  Streamlit URL: https://aircraft-search.streamlit.app
+- Flight number (present on the boarding pass)
+- Aircraft registration number
+- Aircraft image (will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried)
 
 ## Features
 
@@ -18,6 +13,15 @@ The script returns the following information:
 - Details about the aircraft such as Manufacturer, Engines, First flight etc.
 - Image of the aircraft obtained from the [planespotters.net](https://www.planespotters.net/photo/api) API
 - Recent past flights of the aircraft
+
+There are four available versions:
+
+- Base Scraper module with OCR (module without frontend)
+- Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
+- HTML Web interface (Currently in progess)
+- Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+
+  Streamlit URL: https://aircraft-search.streamlit.app
 
 ## Requirements
 
@@ -77,9 +81,11 @@ streamlit run streamlit_web_interface.py
 
 ## Todo
 
+- [x] Enable searching for an aircraft using Flight Number
 - [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can search using aircraft / flight ticket's image
 - [ ] Web interface: Make a web app using the API as backend with features:
-- [ ] Query multiple reg numbers / flight numbers in parallel
+  - [ ] Query multiple reg numbers / flight numbers in parallel
+  - [x] Show aviation related fun facts while the backend API fetches the results
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> Query
 - [ ] Package aircraft_search as pip package
@@ -87,6 +93,6 @@ streamlit run streamlit_web_interface.py
 
 ## License
 
-This project is licensed under the terms of the MIT License.
+This project is licensed under the terms of the [MIT License](LICENSE).
 
 > Parent repository: [04ac/Aircraft-Search](https://github.com/04ac/Aircraft-Search)
