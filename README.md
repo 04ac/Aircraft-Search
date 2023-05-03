@@ -87,7 +87,7 @@ streamlit run streamlit_web_interface.py
   - [ ] Query multiple reg numbers / flight numbers in parallel
   - [x] Show aviation related fun facts while the backend API fetches the results
 - [ ] OCR: Switch to a faster OCR engine
-- [ ] OCR: Flight ticket Flight Number -> Query
+- [x] OCR: Flight ticket Flight Number -> Query
 - [ ] Package aircraft_search as pip package
 - [ ] Add logo image with badges to README.md
 
