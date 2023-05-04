@@ -202,7 +202,7 @@ with tab1:
             display_fun_facts()
 
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            reader = easyocr.Reader(["en"], gpu=True)
+            reader = easyocr.Reader(["en"], gpu=True, model_storage_directory="easyocr_models/", download_enabled=False)
             text_list = list(reader.readtext(img, detail=0))
 
             # Remove Duplicates
@@ -488,7 +488,7 @@ with tab3:
 
         st.markdown("---")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        reader = easyocr.Reader(["en"], gpu=True)
+        reader = easyocr.Reader(["en"], gpu=True, model_storage_directory="easyocr_models/", download_enabled=False)
         text_list = list(reader.readtext(img, detail=0))
 
         # Remove Duplicates
