@@ -1,4 +1,3 @@
-import os
 import re
 import cv2
 import json
@@ -25,11 +24,13 @@ def remove_delimiters(word):
 
 
 def get_website(site_link, reg_no):
+    headers={"user-agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"}
     session = requests.Session()
     adapter = HTTPAdapter(max_retries=Retry(connect=3, backoff_factor=0.5))
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    _request = session.get(site_link + reg_no)
+    _request = session.get(site_link + reg_no, headers=headers)
     return _request.status_code, _request.text
 
 
@@ -226,8 +227,6 @@ with tab1:
                     if len(matches[0]) == len(code):
                         aircraft_details_query(code)
                         st.markdown("---")
-
-            os.remove(uploaded_file.name)
 
         if aircraft_code == "" and uploaded_file is None:
             st.markdown(
@@ -517,5 +516,3 @@ with tab3:
                     number_of_lookups += 1
         if number_of_lookups == 0:
             st.markdown("Flight details not found. Please upload a clear image of the ticket.")
-
-        os.remove(uploaded_file.name)
