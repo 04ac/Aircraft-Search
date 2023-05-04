@@ -16,6 +16,9 @@ import random
 import os
 
 
+st.set_page_config(layout="wide")
+
+
 
 # Downloads easyocr models and creates an easyocr.Reader object
 # This was done at the beginning so that the models get downloaded only once
@@ -179,7 +182,6 @@ def display_fun_facts():
     st.text(random.choice(fun_facts))
 
 
-st.set_page_config(layout="wide")
 st.title("Aircraft Search")
 
 tab1, tab2, tab3 = st.tabs(["Registration", "Flight Number", "Upload Ticket"])
