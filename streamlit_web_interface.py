@@ -18,11 +18,11 @@ import os
 
 
 
-"""
-Downloads easyocr models and creates an easyocr.Reader object
-This was done at the beginning so that the models get downloaded only once
-as the streamlit server has limited memory
-"""
+
+# Downloads easyocr models and creates an easyocr.Reader object
+# This was done at the beginning so that the models get downloaded only once
+# as the streamlit server has limited memory
+
 reader = easyocr.Reader(["en"], gpu=True)
 
 
