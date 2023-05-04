@@ -1,3 +1,4 @@
+import os
 import re
 import cv2
 import json
@@ -225,6 +226,8 @@ with tab1:
                     if len(matches[0]) == len(code):
                         aircraft_details_query(code)
                         st.markdown("---")
+
+            os.remove(uploaded_file.name)
 
         if aircraft_code == "" and uploaded_file is None:
             st.markdown(
@@ -514,3 +517,5 @@ with tab3:
                     number_of_lookups += 1
         if number_of_lookups == 0:
             st.markdown("Flight details not found. Please upload a clear image of the ticket.")
+
+        os.remove(uploaded_file.name)
