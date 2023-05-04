@@ -16,6 +16,16 @@ import random
 import os
 
 
+
+
+"""
+Downloads easyocr models and creates an easyocr.Reader object
+This was done at the beginning so that the models get downloaded only once
+as the streamlit server has limited memory
+"""
+reader = easyocr.Reader(["en"], gpu=True)
+
+
 def remove_delimiters(word):
     _ = []
     for i in word:
@@ -203,7 +213,6 @@ with tab1:
             display_fun_facts()
 
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            reader = easyocr.Reader(["en"], gpu=True, model_storage_directory=os.getcwd() + "/easyocr_models", download_enabled=False)
             text_list = list(reader.readtext(img, detail=0))
 
             # Remove Duplicates
@@ -489,7 +498,6 @@ with tab3:
 
         st.markdown("---")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        reader = easyocr.Reader(["en"], gpu=True, model_storage_directory=os.getcwd() + "/easyocr_models", download_enabled=False)
         text_list = list(reader.readtext(img, detail=0))
 
         # Remove Duplicates
