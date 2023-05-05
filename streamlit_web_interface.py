@@ -32,11 +32,12 @@ def store_model():
     pickle.dump(model, filehandler)
     filehandler.close()
 
+    file = open("models.pkl","rb")
+    reader = pickle.load(file)
+    file.close()
+
 
 store_model()
-file = open("models.pkl","rb")
-reader = pickle.load(file)
-file.close()
 
 
 def remove_delimiters(word):
