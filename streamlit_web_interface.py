@@ -35,9 +35,10 @@ def store_model():
     file = open("models.pkl","rb")
     reader = pickle.load(file)
     file.close()
+    return reader
 
 
-store_model()
+reader = store_model()
 
 
 def remove_delimiters(word):
