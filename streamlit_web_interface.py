@@ -13,6 +13,7 @@ import st_aggrid
 from PIL import Image
 import easyocr
 import random
+import pickle
 import os
 
 
@@ -20,15 +21,22 @@ st.set_page_config(layout="wide")
 
 
 
-# Downloads easyocr models and creates an easyocr.Reader object
-# This was done at the beginning so that the models get downloaded only once
+# Downloads easyocr model and creates an easyocr.Reader object
+# Creates a .pkl file to store the model
+# This was done at the beginning so that the model gets downloaded only once
 # as the streamlit server has limited memory
 @st.cache_resource
-def load_models():
-	  return easyocr.Reader(["en"], gpu=True)
+def store_model():
+    model = easyocr.Reader(["en"], gpu=True)
+    filehandler = open("models.pkl","wb")
+    pickle.dump(model, filehandler)
+    filehandler.close()
 
 
-reader = load_models()
+store_model()
+file = open("models.pkl","rb")
+reader = pickle.load(file)
+file.close()
 
 
 def remove_delimiters(word):
