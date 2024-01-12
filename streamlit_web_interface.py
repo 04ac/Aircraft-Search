@@ -13,6 +13,9 @@ import st_aggrid
 from PIL import Image
 import easyocr
 import random
+from selenium import webdriver
+import os
+from playwright.sync_api import sync_playwright
 
 
 def remove_delimiters(word):
@@ -34,10 +37,11 @@ def get_website(site_link, reg_no):
     return _request.status_code, _request.text
 
 
-def aircraft_details_query(reg_no):
+def aircraft_details_query(reg_no, dr):
     st.title(reg_no)
     data_not_found_flag = [False, False]
 
+    # get aircraft image from planespotters.net API
     req = get_website(
         "https://api.planespotters.net/pub/photos/reg/", reg_no)
     if req[0] > 300:
@@ -53,6 +57,7 @@ def aircraft_details_query(reg_no):
         else:
             st.text("Aircraft image not available")
 
+    # gets extra info (if available) from flightaware
     req = get_website(
         "https://flightaware.com/resources/registration/", reg_no)
 
@@ -75,75 +80,71 @@ def aircraft_details_query(reg_no):
         else:
             data_not_found_flag[0] = True
 
-    req = get_website("https://www.flightera.net/en/planes/", reg_no)
-    if req[0] > 300:
+    dr.get("https://www.flightera.net/en/planes/" + reg_no)
+    soup2 = BeautifulSoup(dr.page_source,"lxml")
+
+    st.subheader("Further Information: \n")
+    info2 = soup2.find('div', class_='py-10 max-w-5xl mx-auto')
+    if info2 == None:
         data_not_found_flag[1] = True
-        if data_not_found_flag[0] is True:
-            st.text("Aircraft details not found")
+        st.text("Details not found")
+        return
+    f = info2.find('div', class_='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8')
+    g = f.find('h1',class_='text-xl font-bold leading-tight text-gray-900 dark:text-white').text
+    # Aircraft name
+    st.text("Aircraft: " + remove_delimiters(g))
+
+    info3 = soup2.find('div', 'bg-white dark:bg-gray-500 shadow overflow-hidden sm:rounded-lg mx-auto p-3')
+    info_grids = info3.find('dl', class_='grid gap-x-4 gap-y-4 grid-cols-2 lg:grid-cols-3')
+    aircraft_info = info_grids.find_all('div', class_='col-span-1 dark:bg-gray-400 bg-gray-100 rounded-lg p-4 shadow text-center text-sm leading-5')
+
+    d = {}
+    for information in aircraft_info:
+        k = information.find('dt', class_='font-bold text-gray-500 dark:text-gray-700')
+        v = information.find('dd', class_='text-gray-900 dark:text-white')
+        if k.text.strip() != 'PICTURE':
+            d[k] = v
+
+    for origin, v in d.items():
+        st.text(f"{origin.text.strip()}: {v.text.strip()}")
+
+    tables = pd.read_html(dr.page_source)
+
+    if data_not_found_flag[0] is True and data_not_found_flag[1] is True:
+        st.text("Aircraft details not found")
+
+    st.subheader("Past Flights (If any):")
+    if len(tables) <= 0:
+        st.text("No past flights found")
     else:
-        st.subheader("Further Information: \n")
-        html = req[1]
-        soup2 = BeautifulSoup(html, "lxml")
-        info2 = soup2.find("div", class_="mx-auto flex max-w-7xl")
-        f = info2.find("div", class_="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8")
-        g = f.find(
-            "h1", class_="text-xl font-bold leading-tight text-gray-900 dark:text-white").text
+        # Drop last column
+        _df = tables[0].iloc[:, :-1]
 
-        st.text("Aircraft: " + remove_delimiters(g))
+        if "TO" in _df.keys().tolist():
+            i = 0
+            # Clean up data in "FROM" column
+            for item in _df["FROM"]:
+                l = []
+                for le in item:
+                    l.append(le)
+                    if le == ")":
+                        break
+                _df["FROM"][i] = "".join(l)
+                i += 1
 
-        i = info2.find(
-            "dl", class_="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3")
-        j = i.find("div", class_="mx-auto mb-4 sm:border-l")
-        k = j.find_all(
-            "td", class_="text-gray-700 dark:text-gray-200 text-sm py-2 font-medium pr-2")
-        l = j.find_all(
-            "td", class_="text-gray-900 dark:text-white py-2 text-sm")
-
-        _dict = dict(zip(k, l))
-
-        for k, v in _dict.items():
-            st.text(f"{k.text.strip()}: {v.text.strip()}")
-
-        tables = pd.read_html(html)
-        df0 = tables[0]
-        df0.rename(columns={0: "Item", 1: "Information"}, inplace=True)
-        st_aggrid.AgGrid(df0, columns_auto_size_mode=2)
-
-        if data_not_found_flag[0] is True and data_not_found_flag[1] is True:
-            st.text("Aircraft details not found")
-
-        st.subheader("Past Flights (If any):")
-        if len(tables) < 3:
-            st.text("No past flights found")
+            i = 0
+            # Clean up data in "TO" column
+            for item in _df["TO"]:
+                l = []
+                for le in item:
+                    l.append(le)
+                    if le == ")":
+                        break
+                _df["TO"][i] = "".join(l)
+                i += 1
+            st_aggrid.AgGrid(_df, columns_auto_size_mode=2)
         else:
-            # Drop last column
-            _df = tables[2].iloc[:, :-1]
-
-            if "TO" in _df.keys().tolist():
-                i = 0
-                # Clean up data in "FROM" column
-                for item in _df["FROM"]:
-                    l = []
-                    for le in item:
-                        l.append(le)
-                        if le == ")":
-                            break
-                    _df["FROM"][i] = "".join(l)
-                    i += 1
-
-                i = 0
-                # Clean up data in "TO" column
-                for item in _df["TO"]:
-                    l = []
-                    for le in item:
-                        l.append(le)
-                        if le == ")":
-                            break
-                    _df["TO"][i] = "".join(l)
-                    i += 1
-                st_aggrid.AgGrid(_df, columns_auto_size_mode=2)
-            else:
-                st.text("No past flights found")
+            st.text("No past flights found")
 
 
 def display_fun_facts():
@@ -169,6 +170,10 @@ def display_fun_facts():
 st.set_page_config(layout="wide")
 st.title("Aircraft Search")
 
+# Use Selenium in headless mode
+os.environ['MOZ_HEADLESS'] = '1'
+dr = webdriver.Firefox()
+
 tab1, tab2 = st.tabs(["Registration", "Flight Number"])
 
 with tab1:
@@ -181,7 +186,7 @@ with tab1:
     if st.button("Search", key=0):
         if aircraft_code != "":
             display_fun_facts()
-            aircraft_details_query(aircraft_code)
+            aircraft_details_query(aircraft_code, dr)
 
         if uploaded_file is not None:
             img = Image.open(uploaded_file)
@@ -224,13 +229,15 @@ with tab1:
                     pattern, code_with_only_alphanumeric_characters_and_hyphens)
                 if len(matches) > 0:
                     if len(matches[0]) == len(code):
-                        aircraft_details_query(code)
+                        aircraft_details_query(code, dr)
                         st.markdown("---")
 
         if aircraft_code == "" and uploaded_file is None:
             st.markdown(
                 "#### Please enter a valid aircraft registration number or upload an image.")
 
+
+## TODO Update Scraping Code for Flight Number
 with tab2:
     st.header("Flight Number Lookup")
 
@@ -352,11 +359,11 @@ with tab2:
                 st.markdown("<h2 style='text-align: right'>" 
                             + "To: " + destination_name + "</h2>", unsafe_allow_html=True)
                 st.markdown("<h3 style='text-align: right'>"
-                             + destination_airport_code + "</h3>", unsafe_allow_html=True)
+                            + destination_airport_code + "</h3>", unsafe_allow_html=True)
                 st.markdown("<h5 style='text-align: right'>"
-                             + terminal_and_gate_destination + "</h5>", unsafe_allow_html=True)
+                            + terminal_and_gate_destination + "</h5>", unsafe_allow_html=True)
                 st.markdown("<h2 style='text-align: right'>"
-                             + arrival + "</h2>", unsafe_allow_html=True)
+                            + arrival + "</h2>", unsafe_allow_html=True)
 
             st.markdown("---")
             frequency_info = info.find('div', class_='col-span-1 text-left').find('dd')
@@ -442,4 +449,3 @@ with tab2:
                 st_aggrid.AgGrid(past_flights_df, columns_auto_size_mode=2)
             else:
                 st.markdown("No past flights found")
-
