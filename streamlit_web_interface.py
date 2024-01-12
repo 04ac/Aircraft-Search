@@ -15,7 +15,6 @@ import easyocr
 import random
 from selenium import webdriver
 import os
-from playwright.sync_api import sync_playwright
 
 
 def remove_delimiters(word):
@@ -239,7 +238,7 @@ with tab1:
 
 ## TODO Update Scraping Code for Flight Number
 with tab2:
-    st.header("Flight Number Lookup")
+    st.header("Flight Number Lookup (Under Maintenance)")
 
     flight_number = st.text_input(
         label="Enter flight number:", placeholder="Example:  DL301").upper().strip()
