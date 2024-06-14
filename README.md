@@ -6,6 +6,9 @@ Aircraft details provider that queries multiple sources to find and display info
 - Aircraft registration number
 - Aircraft image (will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried)
 
+## Can Identify multiple aircraft in a single uploaded image
+![""](./images/aircraft_search_sample2.png)
+
 ## Features
 
 The script returns the following information:
