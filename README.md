@@ -7,7 +7,9 @@ Aircraft details provider that queries multiple sources to find and display info
 - Aircraft image (will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried)
 
 ## Can Identify multiple aircraft in a single uploaded image
-![""](./images/aircraft_search_sample2.png)
+<p align="center">
+  <img src="./images/aircraft_search_sample2.png" hspace="4">
+</p>
 
 ## Features
 
