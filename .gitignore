@@ -4,3 +4,4 @@ _most_recent_aircraft_image.png
 ignore/
 .idea/
 geckodriver.log
+secret.txt

@@ -15,6 +15,9 @@ import easyocr
 import random
 from selenium import webdriver
 import os
+from selenium.webdriver.edge.service import Service
+from selenium.webdriver.edge.options import Options
+from selenium.webdriver.edge.webdriver import WebDriver
 
 
 def remove_delimiters(word):
@@ -25,15 +28,18 @@ def remove_delimiters(word):
     return "".join(_)
 
 
-def get_website(site_link, reg_no):
-    headers={"user-agent":
+## HELPER ITEMS TO GET WEBSITE
+headers={"user-agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"}
-    session = requests.Session()
-    adapter = HTTPAdapter(max_retries=Retry(connect=3, backoff_factor=0.5))
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
+session = requests.Session()
+adapter = HTTPAdapter(max_retries=Retry(connect=3, backoff_factor=0.5))
+session.mount("http://", adapter)
+session.mount("https://", adapter)
+
+def get_website(site_link, reg_no):
     _request = session.get(site_link + reg_no, headers=headers)
     return _request.status_code, _request.text
+
 
 
 def aircraft_details_query(reg_no, dr):
@@ -41,109 +47,199 @@ def aircraft_details_query(reg_no, dr):
     data_not_found_flag = [False, False]
 
     # get aircraft image from planespotters.net API
-    req = get_website(
-        "https://api.planespotters.net/pub/photos/reg/", reg_no)
-    if req[0] > 300:
-        st.text("Aircraft image not available")
-    else:
-        data = json.loads(req[1])
-        if not len(data["photos"]) == 0:
-            # Load and display aircraft image
-            with urllib.request.urlopen(data["photos"][0]["thumbnail_large"]["src"]) as image_url:
-                st.text("Aircraft Image:")
-                aircraft_image = Image.open(image_url)
-                st.image(aircraft_image)
-        else:
+    with st.spinner('Fetching aircraft image...'):
+        req = get_website(
+            "https://api.planespotters.net/pub/photos/reg/", reg_no)
+        if req[0] > 300:
             st.text("Aircraft image not available")
+        else:
+            data = json.loads(req[1])
+            if not len(data["photos"]) == 0:
+                # Load and display aircraft image
+                # st.text(data)
+                try:
+                    with urllib.request.urlopen(data["photos"][0]["thumbnail_large"]["src"]) as image_url:
+                        st.text("Aircraft Image:")
+                        aircraft_image = Image.open(image_url)
+                        st.image(aircraft_image)
+                except:
+                    try:
+                        with urllib.request.urlopen(data["photos"][0]["thumbnail"]["src"]) as image_url:
+                            st.text("Aircraft Image:")
+                            aircraft_image = Image.open(image_url)
+                            st.image(aircraft_image)
+                    except:
+                        st.text("Aircraft image not available")
+            else:
+                st.text("Aircraft image not available")
 
     # gets extra info (if available) from flightaware
-    req = get_website(
-        "https://flightaware.com/resources/registration/", reg_no)
+    with st.spinner('Fetching information from FlightAware...'):
+        req = get_website(
+            "https://flightaware.com/resources/registration/", reg_no)
 
-    if req[0] > 300:
-        data_not_found_flag[0] = True
-    else:
-        soup = BeautifulSoup(req[1], "lxml")
-        info = soup.find("div", class_="pageContainer")
-        f = info.findAll("div", class_="attribute-row")
-
-        _dict = {}
-        for i in f:
-            _dict[i.find("div", class_="medium-1 columns title-text").text] = remove_delimiters(
-                i.find("div", class_="medium-3 columns").text.replace("\n", " "))
-
-        if len(_dict.items()) > 0:
-            df = pd.DataFrame(_dict.items()).rename(
-                columns={0: "Categories", 1: "Information"})
-            st_aggrid.AgGrid(df, columns_auto_size_mode=2)
-        else:
+        if req[0] > 300:
             data_not_found_flag[0] = True
-
-    dr.get("https://www.flightera.net/en/planes/" + reg_no)
-    soup2 = BeautifulSoup(dr.page_source,"lxml")
-
-    st.subheader("Further Information: \n")
-    info2 = soup2.find('div', class_='py-10 max-w-5xl mx-auto')
-    if info2 == None:
-        data_not_found_flag[1] = True
-        st.text("Details not found")
-        return
-    f = info2.find('div', class_='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8')
-    g = f.find('h1',class_='text-xl font-bold leading-tight text-gray-900 dark:text-white').text
-    # Aircraft name
-    st.text("Aircraft: " + remove_delimiters(g))
-
-    info3 = soup2.find('div', 'bg-white dark:bg-gray-500 shadow overflow-hidden sm:rounded-lg mx-auto p-3')
-    info_grids = info3.find('dl', class_='grid gap-x-4 gap-y-4 grid-cols-2 lg:grid-cols-3')
-    aircraft_info = info_grids.find_all('div', class_='col-span-1 dark:bg-gray-400 bg-gray-100 rounded-lg p-4 shadow text-center text-sm leading-5')
-
-    d = {}
-    for information in aircraft_info:
-        k = information.find('dt', class_='font-bold text-gray-500 dark:text-gray-700')
-        v = information.find('dd', class_='text-gray-900 dark:text-white')
-        if k.text.strip() != 'PICTURE':
-            d[k] = v
-
-    for origin, v in d.items():
-        st.text(f"{origin.text.strip()}: {v.text.strip()}")
-
-    tables = pd.read_html(dr.page_source)
-
-    if data_not_found_flag[0] is True and data_not_found_flag[1] is True:
-        st.text("Aircraft details not found")
-
-    st.subheader("Past Flights (If any):")
-    if len(tables) <= 0:
-        st.text("No past flights found")
-    else:
-        # Drop last column
-        _df = tables[0].iloc[:, :-1]
-
-        if "TO" in _df.keys().tolist():
-            i = 0
-            # Clean up data in "FROM" column
-            for item in _df["FROM"]:
-                l = []
-                for le in item:
-                    l.append(le)
-                    if le == ")":
-                        break
-                _df["FROM"][i] = "".join(l)
-                i += 1
-
-            i = 0
-            # Clean up data in "TO" column
-            for item in _df["TO"]:
-                l = []
-                for le in item:
-                    l.append(le)
-                    if le == ")":
-                        break
-                _df["TO"][i] = "".join(l)
-                i += 1
-            st_aggrid.AgGrid(_df, columns_auto_size_mode=2)
         else:
+            soup = BeautifulSoup(req[1], "lxml")
+            info = soup.find("div", class_="pageContainer")
+            f = info.findAll("div", class_="attribute-row")
+
+            _dict = {}
+            for i in f:
+                _dict[i.find("div", class_="medium-1 columns title-text").text] = remove_delimiters(
+                    i.find("div", class_="medium-3 columns").text.replace("\n", " "))
+
+            if len(_dict.items()) > 0:
+                df = pd.DataFrame(_dict.items()).rename(
+                    columns={0: "Categories", 1: "Information"})
+                st_aggrid.AgGrid(df, columns_auto_size_mode=2)
+            else:
+                data_not_found_flag[0] = True
+
+
+    # Get additional information from flightera.net
+    with st.spinner('Retrieving additional aircraft details...'):
+        dr.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        
+        # Set a random user agent
+        user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15"
+        ]
+        dr.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": random.choice(user_agents)})
+        
+        # Add referrer and language headers
+        dr.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'Referer': 'https://www.google.com/',
+                'Accept-Language': 'en-US,en;q=0.9'
+            }
+        })
+        
+        dr.get("https://www.flightera.net/en/planes/" + reg_no)
+        
+        # Add a small delay to allow the page to load
+        import time
+        time.sleep(3)
+        
+        soup2 = BeautifulSoup(dr.page_source, "lxml")
+
+        st.subheader("Further Information: \n")
+        info2 = soup2.find('div', class_='py-10 max-w-5xl mx-auto')
+        if info2 == None:
+            data_not_found_flag[1] = True
+            st.text("Details not found")
+            return
+            
+        f = info2.find('div', class_='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8')
+        if f is None:
+            data_not_found_flag[1] = True
+            st.text("Aircraft details structure not found")
+            return
+            
+        g = f.find('h1',class_='text-xl font-bold leading-tight text-gray-900 dark:text-white')
+        if g is None:
+            st.text("Aircraft name not found")
+        else:
+            st.text("Aircraft: " + remove_delimiters(g.text))
+
+        info3 = soup2.find('div', class_='bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mx-auto p-3')
+        if info3 is None:
+            data_not_found_flag[1] = True
+            st.text("Aircraft details section not found")
+            return
+            
+        # st.text(info3.text)
+        info_grids = info3.find('dl', class_='grid gap-x-4 gap-y-4 grid-cols-2 lg:grid-cols-3')
+        if info_grids is None:
+            data_not_found_flag[1] = True
+            st.text("Aircraft information grid not found")
+            return
+            
+        aircraft_info = info_grids.find_all('div', class_="col-span-1 dark:bg-gray-700 bg-gray-100 rounded-lg p-4 shadow text-center text-sm leading-5")
+
+        d = {}
+        for information in aircraft_info:
+            k = information.find('dt')
+            v = information.find('dd')
+            if k is not None and v is not None and k.text.strip() != 'PICTURE':
+                d[k.text.strip()] = v.text.strip()
+
+        # Create a more visually appealing display
+        def display_aircraft_info():
+            if d:
+                st.markdown("### Aircraft Properties")
+                
+                # Create a two-column layout for better readability
+                col1, col2 = st.columns(2)
+                
+                # Sort the keys alphabetically for a consistent display
+                sorted_keys = sorted(d.keys())
+                
+                # Display each property with improved formatting
+                for key in sorted_keys:
+                    value = d[key]
+                    
+                    # Alternate between columns for better layout
+                    with col1 if sorted_keys.index(key) % 2 == 0 else col2:
+                        # Create a card-like container for each property
+                        with st.container():
+                            # Display key with italic formatting
+                            st.markdown(f"*{key}*")
+                            
+                            # Apply special formatting to certain values
+                            if key == "STATUS" and "active" == value.lower():
+                                st.markdown(f"<span style='color:green; font-weight:500'>{value}</span>", unsafe_allow_html=True)
+                            if key == "STATUS" and any(term in value.lower() for term in ["inactive", "stored", "scrapped"]):
+                                st.markdown(f"<span style='color:red; font-weight:500'>{value}</span>", unsafe_allow_html=True)
+                            else:
+                                st.markdown(value)
+                            
+                            # Add a subtle separator between properties
+                            st.markdown("<hr style='margin: 5px 0; opacity: 0.3'>", unsafe_allow_html=True)
+
+
+        display_aircraft_info()
+
+        tables = pd.read_html(dr.page_source)
+
+        if data_not_found_flag[0] is True and data_not_found_flag[1] is True:
+            st.text("Aircraft details not found")
+
+        st.subheader("Past Flights (If any):")
+        if len(tables) <= 0:
             st.text("No past flights found")
+        else:
+            # Drop last column
+            _df = tables[0].iloc[:, :-1]
+
+            if "TO" in _df.keys().tolist():
+                i = 0
+                # Clean up data in "FROM" column
+                for item in _df["FROM"]:
+                    l = []
+                    for le in item:
+                        l.append(le)
+                        if le == ")":
+                            break
+                    _df["FROM"][i] = "".join(l)
+                    i += 1
+
+                i = 0
+                # Clean up data in "TO" column
+                for item in _df["TO"]:
+                    l = []
+                    for le in item:
+                        l.append(le)
+                        if le == ")":
+                            break
+                    _df["TO"][i] = "".join(l)
+                    i += 1
+                st_aggrid.AgGrid(_df, columns_auto_size_mode=2)
+            else:
+                st.text("No past flights found")
 
 
 def display_fun_facts():
@@ -170,8 +266,11 @@ st.set_page_config(layout="wide")
 st.title("Aircraft Search")
 
 # Use Selenium in headless mode
-os.environ['MOZ_HEADLESS'] = '1'
-dr = webdriver.Firefox()
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--disable-gpu")
+service = Service()
+dr = WebDriver(service=service, options=options)
 
 tab1, tab2 = st.tabs(["Registration", "Flight Number"])
 
@@ -188,48 +287,50 @@ with tab1:
             aircraft_details_query(aircraft_code, dr)
 
         if uploaded_file is not None:
-            img = Image.open(uploaded_file)
-            # Converts PIL image to OpenCv
-            img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-            # Display scaled image if size is too large
-            st.text("Uploaded Image:")
-            if img.shape[0] > 600 or img.shape[1] > 600:
-                w, h, c = img.shape
-                sf = 400 / w
-                img2 = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB),
-                                None, fx=sf, fy=sf, interpolation=cv2.INTER_AREA)
-                st.image(img2)
-            else:
-                st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+            with st.spinner('Processing your image...'):
+                img = Image.open(uploaded_file)
+                # Converts PIL image to OpenCv
+                img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                # Display scaled image if size is too large
+                st.text("Uploaded Image:")
+                if img.shape[0] > 600 or img.shape[1] > 600:
+                    w, h, c = img.shape
+                    sf = 400 / w
+                    img2 = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB),
+                                    None, fx=sf, fy=sf, interpolation=cv2.INTER_AREA)
+                    st.image(img2)
+                else:
+                    st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
-            display_fun_facts()
+                display_fun_facts()
 
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            reader = easyocr.Reader(["en"], gpu=True)
-            text_list = list(reader.readtext(img, detail=0))
+            with st.spinner('Analyzing image for aircraft registration numbers...'):
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                reader = easyocr.Reader(["en"], gpu=True)
+                text_list = list(reader.readtext(img, detail=0))
 
-            # Remove Duplicates
-            list_without_duplicates = []
-            for code in text_list:
-                if code not in list_without_duplicates:
-                    list_without_duplicates.append(code)
+                # Remove Duplicates
+                list_without_duplicates = []
+                for code in text_list:
+                    if code not in list_without_duplicates:
+                        list_without_duplicates.append(code)
 
-            # list_without_duplicates
-            for code in list_without_duplicates:
-                code = code.upper()
-                # Substitute underscores for hyphens
-                code = code.replace("_", "-")
-                # Remove all characters that are not hyphens or alphanumeric
-                code_with_only_alphanumeric_characters_and_hyphens = re.sub(
-                    "[^\w-]", "", code)
-                # Possible prefixes without hyphens: "HL, N, UK, JA, UR(with or without), HI"
-                pattern = r"\w{1,4}-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
-                matches = re.findall(
-                    pattern, code_with_only_alphanumeric_characters_and_hyphens)
-                if len(matches) > 0:
-                    if len(matches[0]) == len(code):
-                        aircraft_details_query(code, dr)
-                        st.markdown("---")
+                # list_without_duplicates
+                for code in list_without_duplicates:
+                    code = code.upper()
+                    # Substitute underscores for hyphens
+                    code = code.replace("_", "-")
+                    # Remove all characters that are not hyphens or alphanumeric
+                    code_with_only_alphanumeric_characters_and_hyphens = re.sub(
+                        "[^\w-]", "", code)
+                    # Possible prefixes without hyphens: "HL, N, UK, JA, UR(with or without), HI"
+                    pattern = r"\w{1,4}-\w+|HL\w{4}|N\d{1,3}\w{2}|N\d{1,5}|UK\d{5}|JA\w{4}|UR\d{5}|HI\w{3,4}"
+                    matches = re.findall(
+                        pattern, code_with_only_alphanumeric_characters_and_hyphens)
+                    if len(matches) > 0:
+                        if len(matches[0]) == len(code):
+                            aircraft_details_query(code, dr)
+                            st.markdown("---")
 
         if aircraft_code == "" and uploaded_file is None:
             st.markdown(

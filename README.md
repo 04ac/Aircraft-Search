@@ -7,6 +7,7 @@ Aircraft details provider that queries multiple sources to find and display info
 - Aircraft image (will be [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition)d and then queried)
 
 ## Can Identify multiple aircraft in a single uploaded image
+
 <p align="center">
   <img src="./images/aircraft_search_sample2.png" hspace="4">
 </p>
@@ -19,14 +20,14 @@ The script returns the following information:
 - Image of the aircraft obtained from the [planespotters.net](https://www.planespotters.net/photo/api) API
 - Recent past flights of the aircraft
 
-There are four available versions:
+<!-- There are four available versions: -->
 
-- Base Scraper module with OCR (module without frontend)
+<!-- - Base Scraper module with OCR (module without frontend)
 - Web API made with [FastAPI](https://github.com/tiangolo/fastapi/)
-- HTML Web interface (Currently in progess)
-- Web interface made with [Streamlit](https://github.com/streamlit/streamlit)
+- HTML Web interface (Currently in progess) -->
 
-  Streamlit URL: https://aircraft-search.streamlit.app
+The web interface is (currently) made with [Streamlit](https://github.com/streamlit/streamlit) \
+Streamlit URL: https://aircraft-search.streamlit.app
 
 ## Requirements
 
@@ -45,7 +46,13 @@ pip install -r requirements.txt
 
 ## Usage
 
-#### - Base scraper module
+#### Streamlit Web Interface
+
+```
+streamlit run streamlit_web_interface.py
+```
+
+<!-- #### - Base scraper module
 
 `example_module.py`:
 
@@ -76,15 +83,9 @@ Visit http://127.0.0.1:8000 in a browser to view the web interface
 
 Available endpoint(s):
 
-- `/query?regno=<input aircraft reg number here>` Request type: GET/POST
+- `/query?regno=<input aircraft reg number here>` Request type: GET/POST -->
 
-#### - Streamlit Web Interface
-
-```
-streamlit run streamlit_web_interface.py
-```
-
-## Todo
+<!-- ## Todo
 
 - [x] Enable searching for an aircraft using Flight Number
 - [ ] API: Enable sending image object as a POST request to `/queryByImage` so that users can search using aircraft / flight ticket's image
@@ -94,7 +95,7 @@ streamlit run streamlit_web_interface.py
 - [ ] OCR: Switch to a faster OCR engine
 - [ ] OCR: Flight ticket Flight Number -> Query
 - [ ] Package aircraft_search as pip package
-- [ ] Add logo image with badges to README.md
+- [ ] Add logo image with badges to README.md -->
 
 ## License
 
