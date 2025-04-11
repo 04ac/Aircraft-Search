@@ -1,1 +1,1 @@
-microsoft-edge-stable
+firefox-esr

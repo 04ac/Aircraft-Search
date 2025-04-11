@@ -13,11 +13,9 @@ import st_aggrid
 from PIL import Image
 import easyocr
 import random
-from selenium import webdriver
-import os
-from selenium.webdriver.edge.service import Service
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.edge.webdriver import WebDriver
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 
 def remove_delimiters(word):
@@ -100,24 +98,6 @@ def aircraft_details_query(reg_no, dr):
 
     # Get additional information from flightera.net
     with st.spinner('Retrieving additional aircraft details...'):
-        dr.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        
-        # Set a random user agent
-        user_agents = [
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15"
-        ]
-        dr.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": random.choice(user_agents)})
-        
-        # Add referrer and language headers
-        dr.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
-            'headers': {
-                'Referer': 'https://www.google.com/',
-                'Accept-Language': 'en-US,en;q=0.9'
-            }
-        })
-        
         dr.get("https://www.flightera.net/en/planes/" + reg_no)
         
         # Add a small delay to allow the page to load
@@ -265,11 +245,23 @@ def display_fun_facts():
 st.set_page_config(layout="wide")
 st.title("Aircraft Search")
 
-# Use Selenium in headless mode
+# Use Selenium in headless mode with Firefox
 options = Options()
-options.add_argument("--headless")
-options.add_argument("--disable-gpu")
-service = Service()
+options.add_argument('--headless')
+
+# Configure a random user agent using Firefox's proper method
+user_agents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0"
+]
+options.set_preference("general.useragent.override", random.choice(user_agents))
+
+# Avoid detection
+options.set_preference("dom.webdriver.enabled", False)
+options.set_preference('useAutomationExtension', False)
+
+service = Service() 
 dr = WebDriver(service=service, options=options)
 
 tab1, tab2 = st.tabs(["Registration", "Flight Number"])
