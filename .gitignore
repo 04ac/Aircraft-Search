@@ -5,3 +5,4 @@ ignore/
 .idea/
 geckodriver.log
 secret.txt
+.venv/
