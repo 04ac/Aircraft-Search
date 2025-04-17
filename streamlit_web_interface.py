@@ -1,5 +1,5 @@
 import re
-import cv2
+# import cv2
 import json
 import urllib.request
 import requests
@@ -16,6 +16,7 @@ import random
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver
+import time
 
 
 def remove_delimiters(word):
@@ -101,7 +102,6 @@ def aircraft_details_query(reg_no, dr):
         dr.get("https://www.flightera.net/en/planes/" + reg_no)
         
         # Add a small delay to allow the page to load
-        import time
         time.sleep(3)
         
         soup2 = BeautifulSoup(dr.page_source, "lxml")
@@ -281,25 +281,34 @@ with tab1:
         if uploaded_file is not None:
             with st.spinner('Processing your image...'):
                 img = Image.open(uploaded_file)
-                # Converts PIL image to OpenCv
-                img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                # Convert PIL image to a numpy array without OpenCV
+                # img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                img_array = np.array(img)
+                
                 # Display scaled image if size is too large
                 st.text("Uploaded Image:")
-                if img.shape[0] > 600 or img.shape[1] > 600:
-                    w, h, c = img.shape
-                    sf = 400 / w
-                    img2 = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB),
-                                    None, fx=sf, fy=sf, interpolation=cv2.INTER_AREA)
-                    st.image(img2)
+                if img_array.shape[0] > 600 or img_array.shape[1] > 600:
+                    w, h = img.size
+                    # Determine scaling factor based on the larger dimension to maintain aspect ratio
+                    max_dim = max(w, h)
+                    sf = 600 / max_dim
+                    # Apply same scaling factor to both dimensions
+                    new_size = (int(w * sf), int(h * sf))
+                    img_resized = img.resize(new_size)
+                    st.image(img_resized)
                 else:
-                    st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+                    # st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+                    st.image(img)
 
                 display_fun_facts()
 
             with st.spinner('Analyzing image for aircraft registration numbers...'):
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                # Convert to grayscale using PIL instead of OpenCV
+                # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img_gray = img.convert('L')
                 reader = easyocr.Reader(["en"], gpu=True)
-                text_list = list(reader.readtext(img, detail=0))
+                # Pass PIL grayscale image to EasyOCR
+                text_list = list(reader.readtext(np.array(img_gray), detail=0))
 
                 # Remove Duplicates
                 list_without_duplicates = []
